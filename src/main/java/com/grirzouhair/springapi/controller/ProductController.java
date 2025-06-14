@@ -19,8 +19,10 @@ public class ProductController {
     private final ProductMapper productMapper;
     @GetMapping
     public List<ProductDto> getAllProducts(
+            @RequestHeader(required = false, name = "x-auth-token") String authToken,
             @RequestParam(required = false, defaultValue = "", name = "id") Long catego
     ) {
+        System.out.println(authToken);
         List<Product> products;
         if (catego != null) {
             products = productRepository.findByCategoryId(catego);
