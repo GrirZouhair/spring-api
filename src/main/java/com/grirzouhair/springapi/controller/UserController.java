@@ -1,12 +1,13 @@
 package com.grirzouhair.springapi.controller;
 
 import com.grirzouhair.springapi.dtos.RegisterUserRequest;
+import com.grirzouhair.springapi.dtos.UpdateUserRequest;
 import com.grirzouhair.springapi.dtos.UserDto;
 import com.grirzouhair.springapi.entities.User;
 import com.grirzouhair.springapi.mappers.UserMapper;
 import com.grirzouhair.springapi.repositories.UserRepository;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -55,5 +56,27 @@ public class UserController {
         var userDto = userMapper.toDto(user);
         var uri = uriBuilder.path("/users/{id}").buildAndExpand(userDto.getId()).toUri();
         return ResponseEntity.created(uri).body(userDto);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserDto> updateUser(@PathVariable(name = "id") Long id,
+                                              @RequestBody UpdateUserRequest request
+    ) {
+    var user = userRepository.findById(id).orElse(null);
+    if (user == null)
+        return ResponseEntity.notFound().build();
+    userMapper.update(request, user);
+    userRepository.save(user);
+    return ResponseEntity.ok(userMapper.toDto(user));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        var user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+        userRepository.delete(user);
+        return ResponseEntity.noContent().build();
     }
 }
