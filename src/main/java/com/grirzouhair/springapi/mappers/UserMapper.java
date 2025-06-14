@@ -1,5 +1,6 @@
 package com.grirzouhair.springapi.mappers;
 
+import com.grirzouhair.springapi.dtos.RegisterUserRequest;
 import com.grirzouhair.springapi.dtos.UserDto;
 import com.grirzouhair.springapi.entities.User;
 import org.mapstruct.Mapper;
@@ -13,4 +14,5 @@ the implementation as a Spring Bean.
 public interface UserMapper {
     @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
     UserDto toDto(User user);
+    User toEntity(RegisterUserRequest request);
 }

@@ -1,5 +1,6 @@
 package com.grirzouhair.springapi.controller;
 
+import com.grirzouhair.springapi.dtos.RegisterUserRequest;
 import com.grirzouhair.springapi.dtos.UserDto;
 import com.grirzouhair.springapi.entities.User;
 import com.grirzouhair.springapi.mappers.UserMapper;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 import java.util.Set;
@@ -44,7 +46,14 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDto createUser(@RequestBody UserDto user){
-        return user;
+    public ResponseEntity<UserDto> createUser(@RequestBody RegisterUserRequest request,
+        UriComponentsBuilder uriBuilder
+    ){
+       var user = userMapper.toEntity(request);
+        userRepository.save(user);
+
+        var userDto = userMapper.toDto(user);
+        var uri = uriBuilder.path("/users/{id}").buildAndExpand(userDto.getId()).toUri();
+        return ResponseEntity.created(uri).body(userDto);
     }
 }
