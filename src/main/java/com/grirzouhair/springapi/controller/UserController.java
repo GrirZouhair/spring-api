@@ -6,6 +6,7 @@ import com.grirzouhair.springapi.dtos.UpdateUserRequest;
 import com.grirzouhair.springapi.dtos.UserDto;
 import com.grirzouhair.springapi.entities.User;
 import com.grirzouhair.springapi.mappers.UserMapper;
+import com.grirzouhair.springapi.repositories.ProductRepository;
 import com.grirzouhair.springapi.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 
@@ -25,6 +26,7 @@ import java.util.Set;
 public class UserController {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final ProductRepository productRepository;
 
     // api for fetch all Users
     @GetMapping
