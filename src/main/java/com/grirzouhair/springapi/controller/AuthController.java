@@ -1,5 +1,6 @@
 package com.grirzouhair.springapi.controller;
 
+import com.grirzouhair.springapi.config.JwtConfig;
 import com.grirzouhair.springapi.dtos.JwtResponse;
 import com.grirzouhair.springapi.dtos.LoginRequest;
 import com.grirzouhair.springapi.dtos.UserDto;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 @RequestMapping("/auth")
 public class AuthController {
+    private final JwtConfig jwtConfig;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final UserRepository userRepository;
@@ -46,7 +48,7 @@ public class AuthController {
         var cookie = new Cookie("refreshToken", refreshToken);
         cookie.setHttpOnly(true);
         cookie.setPath("/auth");
-        cookie.setMaxAge(604800);
+        cookie.setMaxAge(jwtConfig.refreshTokenExpiration);
         cookie.setSecure(true);
         response.addCookie(cookie);
         return ResponseEntity.ok(new JwtResponse(accessToken));
