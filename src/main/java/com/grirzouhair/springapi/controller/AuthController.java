@@ -6,6 +6,8 @@ import com.grirzouhair.springapi.dtos.UserDto;
 import com.grirzouhair.springapi.mappers.UserMapper;
 import com.grirzouhair.springapi.repositories.UserRepository;
 import com.grirzouhair.springapi.services.JwtService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,7 +29,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(
-           @Valid @RequestBody LoginRequest request
+           @Valid @RequestBody LoginRequest request,
+           HttpServletResponse response
     ) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -37,8 +40,16 @@ public class AuthController {
         );
         var user = userRepository.findByEmail(request.getEmail()).orElseThrow();
 
-        var token = jwtService.generateToken(user);
-        return ResponseEntity.ok(new JwtResponse(token));
+        var accessToken = jwtService.generateAccessToken(user);
+        var refreshToken = jwtService.generateRefreshToken(user);
+
+        var cookie = new Cookie("refreshToken", refreshToken);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/auth");
+        cookie.setMaxAge(604800);
+        cookie.setSecure(true);
+        response.addCookie(cookie);
+        return ResponseEntity.ok(new JwtResponse(accessToken));
     }
     @PostMapping("/validate")
     public boolean validate(@RequestHeader("Authorization") String authHeader) {
