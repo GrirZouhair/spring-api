@@ -4,6 +4,7 @@ import com.grirzouhair.springapi.dtos.ChangePasswordRequest;
 import com.grirzouhair.springapi.dtos.RegisterUserRequest;
 import com.grirzouhair.springapi.dtos.UpdateUserRequest;
 import com.grirzouhair.springapi.dtos.UserDto;
+import com.grirzouhair.springapi.entities.Role;
 import com.grirzouhair.springapi.entities.User;
 import com.grirzouhair.springapi.mappers.UserMapper;
 import com.grirzouhair.springapi.repositories.ProductRepository;
@@ -67,6 +68,7 @@ public class UserController {
         }
         var user = userMapper.toEntity(request);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRole(Role.USER);
         userRepository.save(user);
 
         var userDto = userMapper.toDto(user);
