@@ -29,13 +29,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         var token = authHeader.replace("Bearer ", "");
         if (!jwtService.validateToken(token)) {
-            System.out.println("line 2");
             filterChain.doFilter(request, response);
             return;
         }
 
         var authentication = new UsernamePasswordAuthenticationToken(
-                jwtService.getEmailFromToken(token),
+                jwtService.getUserIdFromToken(token),
                 null,
                 null
         );
@@ -44,7 +43,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         );
         //For this HTTP request, treat the user as [this authenticated user]
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        System.out.println("final line");
         filterChain.doFilter(request, response);
     }
 }
