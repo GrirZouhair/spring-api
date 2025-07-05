@@ -1,6 +1,7 @@
 package com.grirzouhair.springapi.config;
 
 
+import com.grirzouhair.springapi.entities.Role;
 import com.grirzouhair.springapi.filters.JwtAuthenticationFilter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,15 +42,22 @@ public class SecurityConfig {
                     .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(c->
                         c.requestMatchers("/products/**").permitAll()
+                        .requestMatchers("/admin/**").hasRole(Role.ADMIN.name())
                                 .requestMatchers(HttpMethod.POST, "/users").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/auth/refresh").permitAll()
                                 .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling(c -> c.authenticationEntryPoint(
-                        new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)
-                ));
-                return http.build();
+                .exceptionHandling(c -> {
+                    c.authenticationEntryPoint(
+                            new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)
+                    );
+                    c.accessDeniedHandler((request, response, accessDeniedException) -> {
+                        response.setStatus(HttpStatus.FORBIDDEN.value());
+                    });
+                });
+
+        return http.build();
     }
 
     @Bean
